@@ -8,19 +8,21 @@ app = Flask(__name__)
 def get_youtube_url():
     url = request.form.get('url')
     ydl_opts = {
-        'format': 'bestaudio/best',
-        'postprocessors': [{
-            'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'mp3',
-            'preferredquality': '192',
-        }],
+        'format': 'worstaudio',
     }
     try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            result = ydl.extract_info(url, download=False)
-            return result['url']
+        result = yt_dlp.YoutubeDL(ydl_opts).extract_info(url, download=False)
+        response = {
+            'status': 'ok',
+            'url': result['url']
+        }
+        return response
     except Exception as e:
-        return f'Error: {e}'
+        response = {
+            'status': 'error',
+            'error': f'{e}'
+        }
+        return response
 
 if __name__ == '__main__':
     http_server = WSGIServer(('0.0.0.0', 80), app)
